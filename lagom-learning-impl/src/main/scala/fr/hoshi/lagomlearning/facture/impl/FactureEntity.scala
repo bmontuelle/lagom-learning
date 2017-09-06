@@ -2,7 +2,7 @@ package fr.hoshi.lagomlearning.facture.impl
 
 import akka.Done
 import com.lightbend.lagom.scaladsl.persistence.PersistentEntity
-import fr.hoshi.lagomlearning.facture.api.model.{FactureCree, FactureTravaux}
+import fr.hoshi.lagomlearning.facture.api.model.{FactureCree, FactureModifiee, FactureTravaux}
 
 class FactureEntity extends PersistentEntity {
 
@@ -39,10 +39,10 @@ class FactureEntity extends PersistentEntity {
           }
         }
       }
-      .onCommand[ModifierFacturationTravaux, Done] {
+      .onCommand[ModifierFacturationTravaux, FactureModifiee] {
         case (ModifierFacturationTravaux(content), ctx, state) => {
           if (state.isEmpty) {
-            ctx.invalidCommand(s"La facture N° $entityId doit etre créer pour pouvoir etre modifiée")
+            ctx.invalidCommand(s"La facture N° $entityId doit etre créée pour pouvoir etre modifiée")
             ctx.done
           }
           else if (content.chiffrage <= 0) {
@@ -51,7 +51,7 @@ class FactureEntity extends PersistentEntity {
           }
           else {
             ctx.thenPersist(FactureTravauxModifiee(entityId, content)) { _ =>
-              ctx.reply(Done)
+              ctx.reply(FactureModifiee(entityId))
             }
           }
         }

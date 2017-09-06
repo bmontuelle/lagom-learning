@@ -9,6 +9,7 @@ object FacturationSerializerRegistry extends JsonSerializerRegistry {
     JsonSerializer[CreerFacturationTravaux],
     JsonSerializer[LireFacturation],
     JsonSerializer[FactureCree],
+    JsonSerializer[FactureModifiee],
     JsonSerializer[FactureTravauxModifiee],
     JsonSerializer[FactureTravaux],
     JsonSerializer[FacturationState],

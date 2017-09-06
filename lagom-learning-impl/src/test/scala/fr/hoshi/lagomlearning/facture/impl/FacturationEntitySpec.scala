@@ -2,12 +2,11 @@ package fr.hoshi.lagomlearning.facture.impl
 
 import java.time.LocalDate
 
-import akka.Done
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
-import com.lightbend.lagom.scaladsl.testkit.PersistentEntityTestDriver
 import com.lightbend.lagom.scaladsl.playjson.JsonSerializerRegistry
-import fr.hoshi.lagomlearning.facture.api.model.{FactureCree, FactureTravaux, FactureTravauxCreation, FactureTravauxModification}
+import com.lightbend.lagom.scaladsl.testkit.PersistentEntityTestDriver
+import fr.hoshi.lagomlearning.facture.api.model._
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpec}
 
 class FacturationEntitySpec extends WordSpec with Matchers with BeforeAndAfterAll {
@@ -41,7 +40,7 @@ class FacturationEntitySpec extends WordSpec with Matchers with BeforeAndAfterAl
       )
       val outcome1 = driver.run(ModifierFacturationTravaux(modification))
       outcome1.events should ===(Vector(FactureTravauxModifiee(entityId, modification)))
-      outcome1.replies should ===(Vector(Done))
+      outcome1.replies should ===(Vector(FactureModifiee(entityId)))
 
       val outcome2 = driver.run(LireFacturation("FV12345678"))
       outcome2.replies should ===(Vector(FactureTravaux("FV12345678",

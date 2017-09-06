@@ -3,7 +3,7 @@ package fr.hoshi.lagomlearning.facture.api
 import akka.{Done, NotUsed}
 import com.lightbend.lagom.scaladsl.api.transport.Method._
 import com.lightbend.lagom.scaladsl.api.{Service, ServiceCall}
-import fr.hoshi.lagomlearning.facture.api.model.{FactureCree, FactureTravaux, FactureTravauxCreation, FactureTravauxModification}
+import fr.hoshi.lagomlearning.facture.api.model._
 
 
 object FacturationService {
@@ -17,7 +17,7 @@ trait FacturationService extends Service {
 
   def create: ServiceCall[FactureTravauxCreation, FactureCree]
 
-  def update(numero: String): ServiceCall[FactureTravauxModification, Done]
+  def update(numero: String): ServiceCall[FactureTravauxModification, FactureModifiee]
 
   /**
     * This gets published to Kafka.

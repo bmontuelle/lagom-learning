@@ -1,10 +1,7 @@
 package fr.hoshi.lagomlearning.facture.impl
 
-import java.time.LocalDate
-
-import akka.Done
 import com.lightbend.lagom.scaladsl.persistence.PersistentEntity.ReplyType
-import fr.hoshi.lagomlearning.facture.api.model.{FactureCree, FactureTravaux, FactureTravauxCreation, FactureTravauxModification}
+import fr.hoshi.lagomlearning.facture.api.model._
 import play.api.libs.json.Json
 
 
@@ -30,7 +27,7 @@ object CreerFacturationTravaux {
 }
 
 
-case class ModifierFacturationTravaux(content: FactureTravauxModification) extends FacturationCommand[Done]
+case class ModifierFacturationTravaux(content: FactureTravauxModification) extends FacturationCommand[FactureModifiee]
 
 object ModifierFacturationTravaux {
   implicit val format = Json.format[ModifierFacturationTravaux]

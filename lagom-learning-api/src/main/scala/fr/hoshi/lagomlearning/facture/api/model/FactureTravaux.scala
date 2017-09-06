@@ -50,3 +50,10 @@ final case class FactureTravauxModification(
 object FactureTravauxModification {
   implicit val format = Json.format[FactureTravauxModification]
 }
+
+
+final case class FactureModifiee(numero: String)
+
+object FactureModifiee {
+  implicit val format = Json.format[FactureModifiee]
+}

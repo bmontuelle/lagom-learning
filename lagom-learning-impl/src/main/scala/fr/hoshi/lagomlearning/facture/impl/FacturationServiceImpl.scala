@@ -1,6 +1,5 @@
 package fr.hoshi.lagomlearning.facture.impl
 
-import akka.Done
 import com.lightbend.lagom.scaladsl.api.ServiceCall
 import com.lightbend.lagom.scaladsl.persistence.PersistentEntityRegistry
 import fr.hoshi.lagomlearning.facture.api.FacturationService
