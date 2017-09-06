@@ -1,9 +1,11 @@
 package fr.hoshi.lagomlearning.facture.impl
 
 import com.lightbend.lagom.scaladsl.api.ServiceCall
+import com.lightbend.lagom.scaladsl.api.broker.Topic
+import com.lightbend.lagom.scaladsl.broker.TopicProducer
 import com.lightbend.lagom.scaladsl.persistence.PersistentEntityRegistry
 import fr.hoshi.lagomlearning.facture.api.FacturationService
-import fr.hoshi.lagomlearning.facture.api.model.{FactureCree, FactureTravauxCreation}
+import fr.hoshi.lagomlearning.facture.api.model.{FactureCree, FactureModifiee, FactureTravauxCreation}
 
 class FacturationServiceImpl (persistentEntityRegistry: PersistentEntityRegistry) extends FacturationService {
 
@@ -28,5 +30,26 @@ class FacturationServiceImpl (persistentEntityRegistry: PersistentEntityRegistry
 
     // Ask the entity the LireFacture command.
     ref.ask(ModifierFacturationTravaux(req))
+  }
+
+  //Streams processors to transform entity event stream to a kafka Topic
+  override def newBillsTopic(): Topic[FactureCree] = {
+    TopicProducer.singleStreamWithOffset { fromOffset =>
+      persistentEntityRegistry.eventStream(FacturationEvent.Tag, fromOffset).map { ev =>
+        ev.event match {
+          case TravauxFactures(numero, content) => (FactureCree(numero), ev.offset)
+        }
+      }
+    }
+  }
+
+  override def updatedBillsTopic(): Topic[FactureModifiee] = {
+    TopicProducer.singleStreamWithOffset { fromOffset =>
+      persistentEntityRegistry.eventStream(FacturationEvent.Tag, fromOffset).map { ev =>
+        ev.event match {
+          case FactureTravauxModifiee(numero, content) => (FactureModifiee(numero), ev.offset)
+        }
+      }
+    }
   }
 }
