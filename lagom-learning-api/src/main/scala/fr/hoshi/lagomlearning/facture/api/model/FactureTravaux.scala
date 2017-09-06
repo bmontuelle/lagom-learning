@@ -2,7 +2,7 @@ package fr.hoshi.lagomlearning.facture.api.model
 
 import java.time.LocalDate
 
-import play.api.libs.json.Json
+import play.api.libs.json._
 
 
 final case class FactureTravaux(
@@ -32,12 +32,6 @@ object FactureTravauxCreation {
 }
 
 
-final case class FactureCree(numero: String)
-
-object FactureCree {
-  implicit val format = Json.format[FactureCree]
-}
-
 final case class FactureTravauxModification(
                                              dateDeFacturation: LocalDate,
                                              dateFinPrestation: LocalDate,
@@ -52,7 +46,35 @@ object FactureTravauxModification {
 }
 
 
-final case class FactureModifiee(numero: String)
+
+sealed trait FactureEvent {
+  def numero: String
+}
+
+object FactureEvent {
+  implicit val reads: Reads[FactureEvent] = {
+    (__ \ "event_type").read[String].flatMap {
+      case "postCreated" => implicitly[Reads[FactureCree]].map(identity)
+      case "postPublished" => implicitly[Reads[FactureModifiee]].map(identity)
+      case other => Reads(_ => JsError(s"Unknown event type $other"))
+    }
+  }
+  implicit val writes: Writes[FactureEvent] = Writes { event =>
+    val (jsValue, eventType) = event match {
+      case m: FactureCree => (Json.toJson(m)(FactureCree.format), "created")
+      case m: FactureModifiee => (Json.toJson(m)(FactureModifiee.format), "updated")
+    }
+    jsValue.transform(__.json.update((__ \ 'event_type).json.put(JsString(eventType)))).get
+  }
+}
+
+final case class FactureCree(numero: String) extends FactureEvent
+
+object FactureCree {
+  implicit val format = Json.format[FactureCree]
+}
+
+final case class FactureModifiee(numero: String) extends FactureEvent
 
 object FactureModifiee {
   implicit val format = Json.format[FactureModifiee]

@@ -9,8 +9,7 @@ import fr.hoshi.lagomlearning.facture.api.model._
 
 
 object FacturationService {
-  val NEW_BILL_TOPIC_NAME = "facturation_crees"
-  val UPDATED_BILL_TOPIC_NAME = "facturation_modifiees"
+  val INVOICES_TOPIC_NAME = "factures"
 }
 
 
@@ -25,8 +24,7 @@ trait FacturationService extends Service {
   /**
     * This gets published to Kafka.
     */
-  def newBillsTopic(): Topic[FactureCree]
-  def updatedBillsTopic(): Topic[FactureModifiee]
+  def invoicesTopic(): Topic[FactureEvent]
 
   override final def descriptor = {
     import Service._
@@ -38,15 +36,13 @@ trait FacturationService extends Service {
         restCall(PUT, "/api/facture/:id", update _)
       )
       .withTopics(
-        topic(FacturationService.NEW_BILL_TOPIC_NAME, newBillsTopic _)
+        topic(FacturationService.INVOICES_TOPIC_NAME, invoicesTopic _)
           // Kafka partitions messages, messages within the same partition will
           // be delivered in order, to ensure that all messages for the same user
           // go to the same partition (and hence are delivered in order with respect
           // to that user), we configure a partition key strategy that extracts the
           // name as the partition key.
-          .addProperty(KafkaProperties.partitionKeyStrategy, PartitionKeyStrategy[FactureCree](_.numero)),
-        topic(FacturationService.UPDATED_BILL_TOPIC_NAME, updatedBillsTopic _)
-          .addProperty(KafkaProperties.partitionKeyStrategy, PartitionKeyStrategy[FactureModifiee](_.numero))
+          .addProperty(KafkaProperties.partitionKeyStrategy, PartitionKeyStrategy[FactureEvent](_.numero))
       )
       .withAutoAcl(true)
     // @formatter:on
